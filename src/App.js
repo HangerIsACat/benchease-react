@@ -1,34 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect }  from "react";
+import 'chart.js/auto';
+import { Bar } from 'react-chartjs-2';
 
-const App = () => {
-  
-  const [skills, setSkills] = useState([]);
-
-  const fetchSkills = async () => {
-    try {
-      const response = await fetch("http://localhost:8181/benchease/v1/hotskills");
-      const data = await response.json();
-
-      setSkills(Array.from(data.result));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+function App() {    
 
   useEffect(() => {
-    fetchSkills();
-  }, []);
+    fetchSamplings();        
+  }, [])
 
-  return (
+  const [chartData, setChartData] = useState({
+    datasets: [] // Instantiates dataset to empty so that chart will be able to execute map() function.
+  });
+
+  const fetchSamplings = async () => {
+    try {
+      const res = await fetch("http://localhost:8181/benchease/v1/hotskills")
+      const data = await res.json();
+
+      updateChartData(data.result);
+    } catch (e) {
+      console.error(e);
+    }
+
+    
+  }
+
+  const updateChartData = (skills) => {
+    setChartData({
+      labels: skills.map((skill) => skill.title),
+      datasets: [
+        {
+          label: "Skill Search Count",
+          backgroundColor: "rgb(254, 114, 93)",
+          borderColor: "rgb(254, 114, 93)",
+          data: skills.map((skill) => skill.searchCount)                    
+        }
+      ]
+    });
+  }
+
+  return(
     <div>
-      <h1>Hot Skills</h1>
-      <ul>
-        {skills.map((skill) => (
-          <li key={skill.id}>{skill.title} : {skill.searchCount}</li>
-        ))}
-      </ul>
+      <Bar data={chartData} />
     </div>
-  );
-};
+  )
+
+}
 
 export default App;
