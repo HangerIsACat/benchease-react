@@ -14,7 +14,7 @@ function App() {
 
   const fetchSamplings = async () => {
     try {
-      const res = await fetch("http://localhost:8181/benchease/v1/hotskills")
+      const res = await fetch("http://ec2-3-1-102-218.ap-southeast-1.compute.amazonaws.com:8181/benchease/v1/hotskills")
       const data = await res.json();
 
       updateChartData(data.result);
